@@ -1,0 +1,59 @@
+﻿@page "/"
+@inject TimeTrackingService TimeTrackingService
+@using MyBlazorApp.Models 
+@using MyBlazorApp.Services
+<h3>Time Tracking App</h3>
+
+<h4>Employees</h4>
+@if (employees == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employee in employees)
+            {
+                <tr>
+                    <td>@employee.Name</td>
+                    <td>@employee.Email</td>
+                    <td>@employee.Department</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => CheckIn(employee.Id)">Check In</button>
+                        <button class="btn btn-secondary" @onclick="() => CheckOut(employee.Id)">Check Out</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await TimeTrackingService.GetEmployeesAsync();
+    }
+
+    private async Task CheckIn(int employeeId)
+    {
+        await TimeTrackingService.CheckInAsync(employeeId);
+        employees = await TimeTrackingService.GetEmployeesAsync();
+    }
+
+    private async Task CheckOut(int employeeId)
+    {
+        await TimeTrackingService.CheckOutAsync(employeeId);
+        employees = await TimeTrackingService.GetEmployeesAsync();
+    }
+}
